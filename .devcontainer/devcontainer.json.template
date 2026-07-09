@@ -1,0 +1,36 @@
+{
+    "name": "TM_Project_$USER_NAME",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USER_ID": "$USER_ID",
+            "GROUP_ID": "$GROUP_ID",
+            "GROUP_NAME": "$GROUP_NAME",
+            "USER_NAME": "$USER_NAME"
+        },
+        "options": [
+            "--tag=tm_project_$USER_NAME:latest"
+        ]
+    },
+    "remoteUser": "$USER_NAME",
+    "updateRemoteUserUID": true,
+    "runArgs": [
+        "--name=tm_project_$USER_NAME"
+    ],
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    ],
+    "workspaceFolder": "/workspace",
+    "overrideCommand": true,
+    "postStartCommand": "pixi install && tmux new -A -d -s do_not_close \\; set -g mouse on",
+    "shutdownAction": "none",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-python.python",
+                "ms-toolsai.jupyter"
+            ]
+        }
+    }
+}

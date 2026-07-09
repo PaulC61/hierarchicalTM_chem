@@ -1,0 +1,3 @@
+[submodule "dev/HierarchicalTsetlinMachine"]
+	path = dev/HierarchicalTsetlinMachine
+	url = https://github.com/cair/HierarchicalTsetlinMachine.git

@@ -1,0 +1,13 @@
+set -euo pipefail
+
+TEMPLATE_FILE=".devcontainer/devcontainer.json.template"
+OUTPUT_FILE=".devcontainer/devcontainer.json"
+
+USER_ID=${USER_ID:-$(id -u)}
+GROUP_ID=${GROUP_ID:-$(id -g)}
+GROUP_NAME=${GROUP_NAME:-$(id -gn)}
+USER_NAME=${USER_NAME:-$(whoami)}
+export USER_ID GROUP_ID GROUP_NAME USER_NAME
+
+echo "Using USER_ID: $USER_ID, GROUP_ID: $GROUP_ID, GROUP_NAME: $GROUP_NAME, USER_NAME: $USER_NAME"
+sed "s/\$USER_ID/$USER_ID/g; s/\$GROUP_ID/$GROUP_ID/g; s/\$GROUP_NAME/$GROUP_NAME/g; s/\$USER_NAME/$USER_NAME/g" < "$TEMPLATE_FILE" > "$OUTPUT_FILE"

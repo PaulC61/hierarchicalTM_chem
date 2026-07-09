@@ -1,0 +1,29 @@
+[workspace]
+name = "TM-Project"
+channels = ["conda-forge"]
+platforms = ["linux-aarch64", "linux-64"]
+
+[tasks]
+test = "pytest -sv tests/"
+
+[dependencies]
+python = ">=3.11"
+pip = "*"
+pycparser = "*"
+numpy = ">=2.3.0,<3"
+scipy = ">=1.15.2,<2"
+ipdb = ">=0.13.13,<0.14"
+pandas = ">=2.3.0,<3"
+scikit-learn = ">=1.7.0,<2"
+libxc-c = ">=7.0.0,<8"
+rdkit = ">=2025.9.2,<2026"
+xgboost = ">=3.2.0,<4"
+
+[pypi-dependencies]
+matplotlib = "*"
+seaborn = "*"
+jupyterlab = "*"
+ipykernel = "*"
+packaging = "*"
+tmu = { path = "./dev/tmu", editable = true }
+chembl_structure_pipeline = { path = "./dev/ChEMBL_Structure_Pipeline", editable = true}
