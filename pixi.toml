@@ -1,7 +1,7 @@
 [workspace]
 name = "TM-Project"
 channels = ["conda-forge"]
-platforms = ["linux-aarch64", "linux-64"]
+platforms = ["osx-arm64", "linux-aarch64", "linux-64"]
 
 [tasks]
 test = "pytest -sv tests/"
@@ -26,4 +26,5 @@ jupyterlab = "*"
 ipykernel = "*"
 packaging = "*"
 tmu = { path = "./dev/tmu", editable = true }
+pyHierarchicalTsetlinMachineCUDA = { path = "./dev/PyHierarchicalTsetlinMachineCUDA", editable = true}
 chembl_structure_pipeline = { path = "./dev/ChEMBL_Structure_Pipeline", editable = true}

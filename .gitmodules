@@ -4,3 +4,6 @@
 [submodule "dev/PyHierarchicalTsetlinMachineCUDA"]
 	path = dev/PyHierarchicalTsetlinMachineCUDA
 	url = git@github.com:cair/PyHierarchicalTsetlinMachineCUDA.git
+[submodule "dev/cair-tmu"]
+	path = dev/cair-tmu
+	url = git@github.com:cair/tmu.git
