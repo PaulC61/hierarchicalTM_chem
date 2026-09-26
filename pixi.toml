@@ -1,12 +1,43 @@
 [workspace]
-name = "TM-Project"
+name = "hierarchicalTM_chem"
 channels = ["conda-forge"]
+# CUDA (PyHierarchicalTsetlinMachineCUDA/pycuda) only ever builds on
+# linux-64, but the default environment below excludes it, so plain
+# everything else (browsing code, running unit tests, GPU-selection
+# tooling) still works on any of these platforms (e.g. a MacBook). Only
+# `pixi install -e gpu` (see the [feature.gpu] tables) requires a
+# linux-64 CUDA box.
 platforms = ["osx-arm64", "linux-aarch64", "linux-64"]
 
 [tasks]
+# One-time setup (run in this order on a fresh clone):
+#   1. git submodule update --init --recursive
+#   2. pixi run fix-submodules
+#   3. pixi install                (CUDA server: also `pixi install -e gpu`)
+fix-submodules = "python scripts/patch_native_deps.py"
 test = "pytest -sv tests/"
+# Prints detected hardware: every NVIDIA GPU nvidia-smi sees, the current
+# GPU selection (see select-gpu below), and whether
+# PyHierarchicalTsetlinMachineCUDA/pycuda actually import/initialize. Run
+# this first on any new machine.
+describe-hardware = "python -m htm_env.hardware"
+# Pick which GPU(s) `pixi run` should use, e.g. `pixi run select-gpu 0`.
+# Persists the choice to a gitignored `.gpu-device` file, read by the `gpu`
+# environment's activation script (scripts/activate_gpu.sh) to export
+# CUDA_VISIBLE_DEVICES on every subsequent `pixi run` / `pixi shell -e gpu`.
+select-gpu = "python scripts/select_gpu.py"
+# A tiny, fast, heavily-commented first run of the library on a toy
+# dataset -- the place to start learning the API. CUDA-only: run with
+# `pixi run -e gpu test-htm`.
+test-htm = "python examples/quickstart_htm.py"
 
 [dependencies]
+# c-compiler/cxx-compiler pull in conda-forge's platform-appropriate
+# compiler + SDK/sysroot activation, so `pixi install` can build tmu's/
+# ChEMBL_Structure_Pipeline's native C extensions (dev/*, editable installs
+# below) from source on any of this workspace's platforms.
+c-compiler = "*"
+cxx-compiler = "*"
 python = ">=3.11"
 pip = "*"
 pycparser = "*"
@@ -17,7 +48,7 @@ pandas = ">=2.3.0,<3"
 scikit-learn = ">=1.7.0,<2"
 libxc-c = ">=7.0.0,<8"
 rdkit = ">=2025.9.2,<2026"
-xgboost = ">=3.2.0,<4"
+pytest = ">=8.0.0"
 
 [pypi-dependencies]
 matplotlib = "*"
@@ -25,6 +56,30 @@ seaborn = "*"
 jupyterlab = "*"
 ipykernel = "*"
 packaging = "*"
+# CPU-only Tsetlin Machine reference implementation, kept for
+# reference/comparison; this project's actual TM backend is the CUDA-only
+# PyHierarchicalTsetlinMachineCUDA (see [feature.gpu] below), not this.
 tmu = { path = "./dev/tmu", editable = true }
-pyHierarchicalTsetlinMachineCUDA = { path = "./dev/PyHierarchicalTsetlinMachineCUDA", editable = true}
-chembl_structure_pipeline = { path = "./dev/ChEMBL_Structure_Pipeline", editable = true}
+chembl_structure_pipeline = { path = "./dev/ChEMBL_Structure_Pipeline", editable = true }
+htm_env = { path = ".", editable = true }
+
+# Opt-in GPU feature: PyHierarchicalTsetlinMachineCUDA hard-depends on
+# `pycuda`, which needs a real CUDA toolchain (nvcc + driver) to build, so
+# it must stay out of the default environment -- otherwise `pixi install`
+# would fail on any machine without one, including a laptop used only for
+# reading code or docs. Enable it on the CUDA server with
+# `pixi install -e gpu`; that's the only environment that can actually
+# import/train the CUDA Tsetlin Machine (see htm_env.hardware).
+[feature.gpu]
+platforms = ["linux-64"]
+
+[feature.gpu.activation]
+scripts = ["scripts/activate_gpu.sh"]
+
+[feature.gpu.pypi-dependencies]
+pycuda = "*"
+PyHierarchicalTsetlinMachineCUDA = { path = "./dev/PyHierarchicalTsetlinMachineCUDA", editable = true }
+
+[environments]
+default = { solve-group = "default" }
+gpu = { features = ["gpu"], solve-group = "default" }

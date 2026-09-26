@@ -1,0 +1,18 @@
+# Pixi
+.pixi/
+*.egg-info/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Devcontainer (generated from devcontainer.json.template by .devcontainer/build)
+.devcontainer/devcontainer.json
+
+# Persisted GPU selection (pixi run select-gpu); machine-specific.
+.gpu-device
+
+# OS cruft
+.DS_Store

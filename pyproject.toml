@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "htm_env"
+version = "0.1.0"
+description = "Hardware assessment and GPU selection helpers for the CUDA-only Hierarchical Tsetlin Machine (PyHierarchicalTsetlinMachineCUDA)."
+requires-python = ">=3.11"
+readme = "README.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "gpu: requires a CUDA GPU and a working PyHierarchicalTsetlinMachineCUDA/pycuda install; skipped automatically when unavailable.",
+]

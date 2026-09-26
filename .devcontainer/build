@@ -9,5 +9,19 @@ GROUP_NAME=${GROUP_NAME:-$(id -gn)}
 USER_NAME=${USER_NAME:-$(whoami)}
 export USER_ID GROUP_ID GROUP_NAME USER_NAME
 
+# Detect an NVIDIA GPU on the host and, if present, pass it through to the
+# container with docker's `--gpus=all` (requires the NVIDIA Container
+# Toolkit on the host). Without this, `pixi install -e gpu` inside the
+# container would have no GPU to talk to. Safe to run on a GPU-less
+# machine: the template line is simply dropped.
+if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1; then
+    echo "NVIDIA GPU detected on host -- container will be started with --gpus=all"
+    GPU_RUN_ARG=', "--gpus=all"'
+else
+    echo "No NVIDIA GPU detected on host -- container will have no GPU access"
+    GPU_RUN_ARG=''
+fi
+export GPU_RUN_ARG
+
 echo "Using USER_ID: $USER_ID, GROUP_ID: $GROUP_ID, GROUP_NAME: $GROUP_NAME, USER_NAME: $USER_NAME"
-sed "s/\$USER_ID/$USER_ID/g; s/\$GROUP_ID/$GROUP_ID/g; s/\$GROUP_NAME/$GROUP_NAME/g; s/\$USER_NAME/$USER_NAME/g" < "$TEMPLATE_FILE" > "$OUTPUT_FILE"
+sed "s/\$USER_ID/$USER_ID/g; s/\$GROUP_ID/$GROUP_ID/g; s/\$GROUP_NAME/$GROUP_NAME/g; s/\$USER_NAME/$USER_NAME/g; s|\$GPU_RUN_ARG|$GPU_RUN_ARG|" < "$TEMPLATE_FILE" > "$OUTPUT_FILE"
