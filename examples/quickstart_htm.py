@@ -11,10 +11,10 @@ This is the same toy problem the upstream library's own examples use
 checked out), reproduced here in miniature.
 
 Run it with:
-    pixi run -e gpu test-htm
+    pixi run test-htm
 
-Requires an NVIDIA GPU + `pixi install -e gpu` (see `pixi run describe-hardware`
-first if you're not sure your setup is ready).
+Requires an NVIDIA GPU + `pixi install` (see `pixi run describe-hardware`
+to check your setup).
 """
 
 from __future__ import annotations
@@ -45,8 +45,7 @@ def main() -> int:
     if not ok:
         print("PyHierarchicalTsetlinMachineCUDA is not usable in this environment:")
         print(f"  {detail}")
-        print("\nRun `pixi run describe-hardware` for a full diagnostic, and make")
-        print("sure you're using the `gpu` pixi environment: `pixi install -e gpu`.")
+        print("\nRun `pixi run describe-hardware` for a full diagnostic.")
         return 1
 
     # Imported lazily and only after confirming it works above -- importing

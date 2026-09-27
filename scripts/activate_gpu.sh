@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Activation hook for the pixi `gpu` environment.
+# Activation hook for the default Pixi environment.
 #
 # Reads a gitignored `.gpu-device` file (written by `pixi run select-gpu`) at
 # the project root and exports CUDA_VISIBLE_DEVICES accordingly, so every

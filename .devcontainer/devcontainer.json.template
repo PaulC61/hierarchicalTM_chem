@@ -15,14 +15,15 @@
     "remoteUser": "$USER_NAME",
     "updateRemoteUserUID": true,
     "runArgs": [
-        "--name=tm_project_$USER_NAME"$GPU_RUN_ARG
+        "--name=tm_project_$USER_NAME",
+        "--gpus=all"
     ],
     "mounts": [
         "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
     ],
     "workspaceFolder": "/workspace",
     "overrideCommand": true,
-    "postStartCommand": "pixi install && (command -v nvidia-smi >/dev/null 2>&1 && pixi install -e gpu || echo 'No GPU in container -- skipping gpu environment') && tmux new -A -d -s do_not_close \\; set -g mouse on",
+    "postStartCommand": "pixi install && tmux new -A -d -s do_not_close \\; set -g mouse on",
     "shutdownAction": "none",
     "customizations": {
         "vscode": {

@@ -1,4 +1,8 @@
-FROM ghcr.io/prefix-dev/pixi:0.41.4  AS build
+FROM ghcr.io/prefix-dev/pixi:0.41.4 AS pixi
+
+FROM nvidia/cuda:13.2.0-devel-ubuntu24.04
+
+COPY --from=pixi /usr/local/bin/pixi /usr/local/bin/pixi
 
 # Important packages
 RUN apt-get update && apt-get install -y \

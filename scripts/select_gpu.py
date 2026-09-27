@@ -8,7 +8,7 @@ Usage:
     pixi run select-gpu --clear    # remove the pinned selection (use all GPUs)
 
 The selection is written to a gitignored `.gpu-device` file at the project
-root. The pixi `gpu` environment's activation script reads that file and
+root. Pixi's activation script reads that file and
 exports `CUDA_VISIBLE_DEVICES` accordingly on every `pixi run` / `pixi shell`.
 """
 

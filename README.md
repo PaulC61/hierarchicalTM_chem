@@ -4,7 +4,7 @@ This repo is built around [`PyHierarchicalTsetlinMachineCUDA`](https://github.co
 a Hierarchical Tsetlin Machine implementation that **requires an NVIDIA
 GPU** (it imports `pycuda` and opens a CUDA context as soon as the library
 module is imported). Everything here is set up to make it as easy as
-possible to: get a working environment via [pixi](https://pixi.sh), check
+possible to: get a working CUDA environment via [pixi](https://pixi.sh), check
 what GPU hardware is actually available, pick which GPU(s) to use, and run
 a first, fast, well-commented example to learn the library's API.
 
@@ -17,20 +17,19 @@ cd hierarchicalTM_chem
 git submodule update --init --recursive
 
 pixi run fix-submodules   # one-time native build fix for dev/tmu
-pixi install              # base environment (works on any machine)
+pixi install              # installs the CUDA backend in the default environment
 
 pixi run describe-hardware   # what GPU(s), if any, are visible?
 pixi run select-gpu 0        # pick a GPU (only meaningful with >1 GPU)
 
-pixi install -e gpu               # CUDA-only: pulls in pycuda + the TM library
-pixi run -e gpu describe-hardware # confirm the library actually imports
-pixi run -e gpu test-htm          # tiny, fast, first training run
+pixi run describe-hardware # confirm the library actually imports
+pixi run test-htm          # tiny, fast, first training run
 ```
 
-`pixi run <task>` uses the `default` environment unless you pass `-e gpu`.
-Only the `gpu` environment can actually train a Tsetlin Machine; the
-default environment is enough for browsing code, running unit tests, and
-GPU discovery/selection on any machine (e.g. a laptop with no GPU at all).
+This project targets Linux with an NVIDIA GPU and CUDA toolkit. The default
+Pixi environment includes `pycuda` and `PyHierarchicalTsetlinMachineCUDA`,
+so `pixi run` and `pixi shell` both use the CUDA backend. In VS Code notebooks,
+select `.pixi/envs/default/bin/python` as the kernel.
 
 ## Devcontainer
 
@@ -41,12 +40,9 @@ chmod +x .devcontainer/build
 ./.devcontainer/build       # generates .devcontainer/devcontainer.json
 ```
 
-Then "Reopen in Container". The build script detects an NVIDIA GPU on the
-host and, if found, starts the container with `--gpus=all` (requires the
-NVIDIA Container Toolkit on the host); `postStartCommand` then runs
-`pixi install`, and additionally `pixi install -e gpu` only if `nvidia-smi`
-is reachable *inside* the container. On a non-GPU machine you still get a
-fully working container for everything except actually training a TM.
+Then "Reopen in Container". Docker starts the container with `--gpus=all`
+(requires an NVIDIA GPU and the NVIDIA Container Toolkit on the host), and
+`postStartCommand` runs `pixi install` for the single environment.
 
 ## Hardware assessment & GPU selection
 
@@ -67,13 +63,13 @@ pixi run select-gpu --clear  # go back to "all GPUs visible"
 ```
 
 This writes a small, gitignored `.gpu-device` file at the project root.
-The `gpu` pixi environment's activation script (`scripts/activate_gpu.sh`)
+The Pixi activation script (`scripts/activate_gpu.sh`)
 reads it and exports `CUDA_VISIBLE_DEVICES` automatically on every
-subsequent `pixi run -e gpu ...` / `pixi shell -e gpu`.
+subsequent `pixi run ...` / `pixi shell`.
 
 ## Learning / testing the library
 
-`examples/quickstart_htm.py` (run via `pixi run -e gpu test-htm`) trains a
+`examples/quickstart_htm.py` (run via `pixi run test-htm`) trains a
 plain (non-hierarchical) `TsetlinMachine` on a tiny noisy-XOR toy dataset
 in a few seconds -- a fast way to confirm the environment works and to see
 the library's basic `fit`/`predict`/`score` API. It's heavily commented;
@@ -87,16 +83,15 @@ explore the hierarchical grouping API further.
 pixi run test
 ```
 
-Runs `pytest` over `tests/`. Tests marked `@pytest.mark.gpu` are
-auto-skipped unless `PyHierarchicalTsetlinMachineCUDA` actually imports
-(see `tests/conftest.py`), so `pixi run test` is safe on any machine.
+Runs `pytest` over `tests/`. Tests marked `@pytest.mark.gpu` require a
+working CUDA backend.
 
 ## Repo layout
 
 - `src/htm_env/` -- GPU discovery/selection helpers (`hardware.py`).
 - `examples/` -- small, standalone scripts for learning the TM library.
 - `scripts/` -- one-time setup (`patch_native_deps.py`), the GPU picker
-  CLI (`select_gpu.py`), and the pixi `gpu` environment's activation hook
+  CLI (`select_gpu.py`), and Pixi's activation hook
   (`activate_gpu.sh`).
 - `dev/` -- git submodules: `PyHierarchicalTsetlinMachineCUDA` (the CUDA
   TM library itself), `tmu` (CPU-only TM reference implementation, kept
